@@ -143,6 +143,22 @@
     transition:opacity .15s;
   }
   .btn-new:hover{opacity:.88;}
+  .btn-search{
+    width:100%;
+    padding:9px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink-soft);
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    margin-bottom:16px;
+    transition:border-color .15s, color .15s;
+  }
+  .btn-search:hover{border-color:var(--primary); color:var(--primary);}
+  .btn-search.active{border-color:var(--primary); color:var(--primary); background:var(--primary-soft);}
   .history-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
   .history-item{
     padding:9px 10px;
@@ -377,32 +393,23 @@
 
   /* metric step sequence */
   .metric-track{
-    display:flex;
-    gap:0;
-    overflow-x:auto;
-    padding-bottom:10px;
-    margin:0 -2px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+  }
+  @media (max-width:760px){
+    .metric-track{grid-template-columns:repeat(2, 1fr);}
+  }
+  @media (max-width:480px){
+    .metric-track{grid-template-columns:1fr;}
   }
   .metric-card{
     background:var(--panel);
     border:1px solid var(--line);
     border-radius:12px;
     padding:16px 16px 14px;
-    min-width:206px;
-    max-width:206px;
-    flex:none;
     position:relative;
   }
-  .metric-card + .metric-card{margin-left:14px;}
-  .metric-card::before{
-    content:'';
-    position:absolute;
-    left:-14px; top:50%;
-    width:14px; height:1px;
-    background:var(--line);
-    border-top:2px dotted var(--ink-faint);
-  }
-  .metric-card:first-child::before{display:none;}
   .metric-card .m-label{font-size:12.5px; color:var(--ink-soft); font-weight:700; margin-bottom:8px; min-height:32px;}
   .m-values{display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
   .m-value-box{
@@ -429,6 +436,40 @@
   .status-pill.bad{background:var(--coral-soft); color:var(--coral);}
   .status-pill .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
   .m-explain{font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+  .m-graph{
+    margin-top:10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    cursor:zoom-in;
+    max-height:140px;
+  }
+  .m-graph img{width:100%; height:100%; object-fit:cover; display:block;}
+
+  /* report image gallery */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
+    gap:10px;
+  }
+  .gallery-thumb{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    cursor:zoom-in;
+    background:var(--panel);
+    aspect-ratio:3/4;
+  }
+  .gallery-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .lightbox{
+    position:fixed; inset:0;
+    background:rgba(10,18,16,0.86);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100;
+    padding:30px;
+    cursor:zoom-out;
+  }
+  .lightbox img{max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,0.5);}
 
   /* concerns + videos */
   .concern-grid{
@@ -480,6 +521,104 @@
     line-height:1.6;
   }
 
+  /* patient record search */
+  .search-bar{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .search-bar input{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:11px 14px;
+    font-family:var(--sans);
+    font-size:14px;
+    color:var(--ink);
+    background:var(--panel);
+  }
+  .search-bar input:focus{outline:none; border-color:var(--primary);}
+  .record-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .record-table th{
+    text-align:left;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-faint);
+    font-weight:700;
+    padding:10px 14px;
+    background:var(--bg-alt);
+    border-bottom:1px solid var(--line);
+  }
+  .record-table td{
+    padding:11px 14px;
+    font-size:13.5px;
+    color:var(--ink);
+    border-bottom:1px solid var(--line);
+  }
+  .record-table tr:last-child td{border-bottom:none;}
+  .record-row{cursor:pointer; transition:background .12s;}
+  .record-row:hover{background:var(--primary-soft);}
+  .record-table .rt-mono{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);}
+  .record-table .rt-chip{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--primary);
+    background:var(--primary-soft);
+    padding:2px 8px;
+    border-radius:999px;
+  }
+  .search-empty{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--ink-faint);
+    font-size:13.5px;
+  }
+  .search-count{font-size:12.5px; color:var(--ink-faint); margin-bottom:10px;}
+
+  /* kakao send */
+  .kakao-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .kakao-card .kk-info{font-size:12.5px; color:var(--ink-soft);}
+  .kakao-card .kk-info strong{color:var(--ink);}
+  .btn-kakao{
+    padding:10px 18px;
+    border-radius:10px;
+    border:none;
+    background:#FEE500;
+    color:#1B1B1B;
+    font-family:var(--sans);
+    font-weight:800;
+    font-size:13.5px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .btn-kakao:hover{opacity:.9;}
+  .btn-kakao:disabled{opacity:.5; cursor:not-allowed;}
+  .kk-status{font-size:12px; margin-top:6px;}
+  .kk-status.ok{color:var(--green);}
+  .kk-status.err{color:var(--coral);}
+
   /* ---------- Patient info form ---------- */
   .form-card{
     background:var(--panel);
@@ -500,11 +639,12 @@
   .form-card .form-title .req{font-size:10.5px; color:var(--ink-faint); font-weight:500;}
   .form-grid{
     display:grid;
-    grid-template-columns:1.2fr 1fr 1fr;
+    grid-template-columns:1.1fr 0.9fr 1fr 1fr;
     gap:12px;
     margin-bottom:14px;
   }
-  @media (max-width:640px){ .form-grid{grid-template-columns:1fr;} }
+  @media (max-width:760px){ .form-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:480px){ .form-grid{grid-template-columns:1fr;} }
   .field label{
     display:block;
     font-size:11.5px;
@@ -618,6 +758,7 @@
     <aside class="sidebar">
       <h2>기록</h2>
       <button class="btn-new" id="btnNew">+ 새 리포트 분석</button>
+      <button class="btn-search" id="btnSearch">🔍 환자 기록 검색</button>
       <ul class="history-list" id="historyList">
         <li class="history-empty">아직 분석 기록이 없어요.</li>
       </ul>
@@ -649,7 +790,14 @@ document.getElementById('btnNew').addEventListener('click', () => {
   uploadedFiles = [];
   currentResult = null;
   setActiveHistory(null);
+  document.getElementById('btnSearch').classList.remove('active');
   renderUpload();
+});
+
+document.getElementById('btnSearch').addEventListener('click', () => {
+  setActiveHistory(null);
+  document.getElementById('btnSearch').classList.add('active');
+  renderHistorySearch();
 });
 
 /* ===================== 업로드 화면 ===================== */
@@ -670,6 +818,10 @@ function renderUpload(){
         <div class="field">
           <label>차트번호</label>
           <input type="text" id="pChart" placeholder="예: M-1000756">
+        </div>
+        <div class="field">
+          <label>전화번호 <span class="req">(선택 · 카카오톡 발송용)</span></label>
+          <input type="text" id="pPhone" placeholder="예: 010-1234-5678" inputmode="tel">
         </div>
       </div>
 
@@ -842,6 +994,7 @@ async function runAnalysis(){
     name: (document.getElementById('pName') || {}).value?.trim() || '',
     dob: (document.getElementById('pDob') || {}).value?.trim() || '',
     chartNo: (document.getElementById('pChart') || {}).value?.trim() || '',
+    phone: (document.getElementById('pPhone') || {}).value?.trim() || '',
     history: (document.getElementById('pHistory') || {}).value?.trim() || '',
     diagnosisText: (document.getElementById('pDiagnosisText') || {}).value?.trim() || ''
   };
@@ -858,13 +1011,40 @@ async function runAnalysis(){
       videos = await callVideoSearch(extract.concerns);
     }
 
-    currentResult = { extract, videos, patientInputs };
+    // 결과 화면/기록 저장용으로 리포트 원본 이미지를 축소본(저장 용량 절약)으로 준비
+    const galleryImages = [];
+    for (const f of uploadedFiles){
+      try{ galleryImages.push(await downscaleImage(f.dataUrl, 700, 0.72)); }
+      catch(e){ galleryImages.push(f.dataUrl); }
+    }
+
+    currentResult = { extract, videos, patientInputs, images: galleryImages };
     saveHistory(currentResult);
     renderResults(currentResult);
   }catch(err){
     console.error(err);
     renderError(err.message || '분석 중 문제가 발생했어요.');
   }
+}
+
+/**
+ * 이미지를 지정한 최대 너비/화질로 축소한 JPEG dataURL로 변환합니다.
+ * (원본은 AI 분석용으로 이미 사용했고, 이건 화면 표시·기록 저장용 가벼운 버전입니다)
+ */
+function downscaleImage(dataUrl, maxWidth, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
 }
 
 function renderError(msg){
@@ -905,9 +1085,10 @@ async function callExtract(files, patientInputs, diagnosisImg){
     content.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: diagnosisImg.split(',')[1] } });
   }
 
-  // 3) 검사 리포트 이미지
-  content.push({ type: 'text', text: '다음은 검사 리포트 이미지입니다:' });
-  files.forEach(f => {
+  // 3) 검사 리포트 이미지 (번호를 명시해서, 나중에 metrics의 source_image_index로 정확히 참조 가능하게)
+  content.push({ type: 'text', text: '다음은 검사 리포트 이미지입니다. 각 이미지 앞에 번호를 표시했습니다 (0부터 시작):' });
+  files.forEach((f, i) => {
+    content.push({ type: 'text', text: '[이미지 ' + i + ']' });
     content.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: f.dataUrl.split(',')[1] } });
   });
 
@@ -975,7 +1156,8 @@ const EXTRACT_PROMPT = `당신은 정형외과에서 근무하는 물리치료�
       "unit": "단위(없으면 빈 문자열)",
       "normal_range": "표준범위 텍스트(등급 기준이면 등급 설명)",
       "status": "good 또는 caution 또는 bad 중 하나",
-      "explanation": "이 수치가 의미하는 바를 환자가 이해하기 쉽게 1~2문장으로 (방향성이 있으면 방향도 설명)"
+      "explanation": "이 수치가 의미하는 바를 환자가 이해하기 쉽게 1~2문장으로 (방향성이 있으면 방향도 설명)",
+      "source_image_index": "이 항목과 관련된 그래프/사진/표가 있는 첨부 이미지의 번호(0부터 시작, 검사 리포트 이미지가 순서대로 몇 번째인지). 관련 이미지가 없거나 모르면 null"
     }
   ],
   "concerns": [ 운동이 도움될 만한 주요 이슈, 최대 3개. 문제가 뚜렷하지 않으면 빈 배열도 가능,
@@ -1025,7 +1207,10 @@ function renderResults(result){
     ? `<div class="score-ring"><div class="num">${escapeHtml(String(ex.overall_score))}</div><div class="lbl">SCORE</div></div>`
     : '';
 
-  const metricsHtml = (ex.metrics || []).map(m => `
+  const metricsHtml = (ex.metrics || []).map(m => {
+    const imgIdx = (m.source_image_index !== null && m.source_image_index !== undefined) ? parseInt(m.source_image_index, 10) : null;
+    const imgSrc = (imgIdx !== null && !isNaN(imgIdx) && result.images && result.images[imgIdx]) ? result.images[imgIdx] : null;
+    return `
     <div class="metric-card">
       <div class="m-label">${escapeHtml(m.label || '')}</div>
       <div class="m-values">
@@ -1036,8 +1221,10 @@ function renderResults(result){
       ${m.normal_range ? `<div class="m-range">표준범위 ${escapeHtml(m.normal_range)}</div>` : ''}
       <div class="status-pill ${statusClass(m.status)}"><span class="dot"></span>${statusLabel(m.status)}</div>
       <div class="m-explain">${escapeHtml(m.explanation || '')}</div>
+      ${imgSrc ? `<div class="m-graph" data-img-idx="${imgIdx}"><img src="${imgSrc}" alt="${escapeHtml(m.label||'')} 관련 그래프"></div>` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   const concernsHtml = (ex.concerns || []).map(c => {
     const vids = videosByIssue[c.issue] || [];
@@ -1089,10 +1276,20 @@ function renderResults(result){
         </div>
       ` : ''}
 
+      ${(result.images && result.images.length) ? `
+        <div>
+          <div class="section-label">리포트 원본 그래프·사진</div>
+          <div class="gallery-grid" id="galleryGrid">
+            ${result.images.map((src,i) => `<div class="gallery-thumb" data-i="${i}"><img src="${src}" alt="리포트 이미지 ${i+1}"></div>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       ${concernsHtml ? `
         <div>
           <div class="section-label">맞춤 운동 추천</div>
           <div class="concern-grid">${concernsHtml}</div>
+          ${renderKakaoCard(result)}
         </div>
       ` : ''}
 
@@ -1105,52 +1302,147 @@ function renderResults(result){
     document.body.classList.toggle('patient-mode', patientMode);
     renderResults(currentResult);
   });
+
+  const galleryGrid = document.getElementById('galleryGrid');
+  if (galleryGrid){
+    galleryGrid.querySelectorAll('.gallery-thumb').forEach(el => {
+      el.addEventListener('click', () => openLightbox(result.images[parseInt(el.dataset.i,10)]));
+    });
+  }
+
+  mainEl.querySelectorAll('.m-graph').forEach(el => {
+    el.addEventListener('click', () => openLightbox(result.images[parseInt(el.dataset.imgIdx, 10)]));
+  });
+
+  const kakaoBtn = document.getElementById('btnSendKakao');
+  if (kakaoBtn){
+    kakaoBtn.addEventListener('click', () => sendKakaoRecommendation(result));
+  }
+}
+
+function openLightbox(src){
+  const box = document.createElement('div');
+  box.className = 'lightbox';
+  box.innerHTML = `<img src="${src}" alt="">`;
+  box.addEventListener('click', () => box.remove());
+  document.body.appendChild(box);
 }
 
 function statusClass(s){ return s === 'good' ? 'good' : s === 'bad' ? 'bad' : 'caution'; }
 function statusLabel(s){ return s === 'good' ? '좋음' : s === 'bad' ? '주의 필요' : '보통'; }
 
-/* ===================== 기록 저장/불러오기 (브라우저 localStorage 사용) ===================== */
-const LOCAL_STORAGE_KEY = 'gaitlab_history_v1';
-
-function readLocalHistory(){
-  try{
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
+/* ===================== 카카오톡 발송 ===================== */
+function renderKakaoCard(result){
+  const phone = result.patientInputs && result.patientInputs.phone;
+  if (!phone){
+    return `
+      <div class="kakao-card" style="margin-top:14px;">
+        <div class="kk-info">환자 정보에 <strong>전화번호</strong>를 입력하면, 이 운동 추천을 카카오톡으로 바로 보낼 수 있어요.</div>
+      </div>
+    `;
+  }
+  return `
+    <div class="kakao-card" style="margin-top:14px;">
+      <div class="kk-info"><strong>${escapeHtml(phone)}</strong> 님에게 운동 추천 목록을 카카오톡으로 보낼까요?</div>
+      <div>
+        <button class="btn-kakao" id="btnSendKakao">💬 카카오톡으로 보내기</button>
+        <div class="kk-status" id="kkStatus"></div>
+      </div>
+    </div>
+  `;
 }
 
-function writeLocalHistory(entries){
-  try{
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
-  }catch(e){ console.warn('기록 저장 실패(용량 초과 등)', e); }
+function buildExerciseMessage(result){
+  const lines = [];
+  lines.push((result.extract.patient_name || '환자') + '님, 검사 결과를 바탕으로 도움이 될 만한 운동을 보내드려요.');
+  (result.extract.concerns || []).forEach(c => {
+    lines.push('');
+    lines.push('[' + c.issue + ']');
+    const vids = (result.videos.videos || []).filter(v => v.issue === c.issue);
+    vids.forEach(v => lines.push('- ' + v.title + ' : ' + v.url));
+  });
+  return lines.join('\n');
 }
 
+async function sendKakaoRecommendation(result){
+  const btn = document.getElementById('btnSendKakao');
+  const statusEl = document.getElementById('kkStatus');
+  btn.disabled = true;
+  statusEl.textContent = '전송 중…';
+  statusEl.className = 'kk-status';
+
+  try{
+    const res = await fetch('/api/send-kakao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: result.patientInputs.phone,
+        patientName: result.extract.patient_name || '환자',
+        message: buildExerciseMessage(result)
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '전송에 실패했어요.');
+    statusEl.textContent = '전송 완료!';
+    statusEl.className = 'kk-status ok';
+  }catch(err){
+    statusEl.textContent = escapeHtml(err.message);
+    statusEl.className = 'kk-status err';
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+/* ===================== 기록 저장/불러오기 (공유 서버 DB 사용) ===================== */
 async function saveHistory(result){
+  const id = 'analysis-' + Date.now();
+  const entry = {
+    id,
+    patientName: result.extract.patient_name || '환자',
+    testDate: result.extract.test_date || '',
+    savedAt: new Date().toISOString(),
+    result
+  };
+
+  // 화면은 즉시 반영 (서버 응답을 기다리지 않고 먼저 목록 맨 위에 추가)
+  historyCache.unshift(entry);
+  renderHistory();
+  setActiveHistory(id);
+
   try{
-    const id = 'analysis-' + Date.now();
-    const entry = {
-      id,
-      patientName: result.extract.patient_name || '환자',
-      testDate: result.extract.test_date || '',
-      savedAt: new Date().toISOString(),
-      result
-    };
-    const entries = readLocalHistory();
-    entries.unshift(entry);
-    // 브라우저 저장 용량 관리를 위해 최근 100건만 유지
-    writeLocalHistory(entries.slice(0, 100));
-    historyCache = entries;
-    renderHistory();
-    setActiveHistory(id);
-  }catch(e){ console.warn('저장 실패', e); }
+    const res = await fetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        patientName: entry.patientName,
+        chartNo: result.extract.chart_no || '',
+        dob: result.extract.dob || '',
+        phone: (result.patientInputs && result.patientInputs.phone) || '',
+        testDate: entry.testDate,
+        data: result
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '저장 실패');
+  }catch(e){
+    console.warn('서버 저장 실패 (이 기기에서만 임시로 보여요)', e);
+  }
 }
 
 async function loadHistory(){
   try{
-    const entries = readLocalHistory();
-    entries.sort((a,b) => new Date(b.savedAt) - new Date(a.savedAt));
-    historyCache = entries;
+    const res = await fetch('/api/records');
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '불러오기 실패');
+
+    historyCache = (data.records || []).map(row => ({
+      id: row.id,
+      patientName: row.patient_name || '환자',
+      testDate: row.test_date || '',
+      savedAt: row.saved_at,
+      result: row.data
+    }));
     renderHistory();
   }catch(e){
     console.warn('기록 불러오기 실패', e);
@@ -1183,6 +1475,84 @@ function renderHistory(){
 function setActiveHistory(id){
   historyListEl.querySelectorAll('.history-item').forEach(el => {
     el.classList.toggle('active', el.dataset.id === id);
+  });
+}
+
+/* ===================== 환자 기록 검색 탭 ===================== */
+function renderHistorySearch(){
+  mainEl.innerHTML = `
+    <div class="results">
+      <div class="toolbar">
+        <div class="toolbar-title">환자 기록 검색</div>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="recordSearchInput" placeholder="이름, 차트번호, 생년월일, 전화번호, 검사일로 검색...">
+      </div>
+      <div class="search-count" id="recordSearchCount"></div>
+      <div id="recordTableArea"></div>
+    </div>
+  `;
+
+  const input = document.getElementById('recordSearchInput');
+  // input 이벤트는 표 영역만 갱신 (검색창 자체는 다시 만들지 않아야 한글 조합이 안 깨짐)
+  input.addEventListener('input', () => updateRecordTable(input.value));
+  input.focus();
+
+  updateRecordTable('');
+}
+
+function updateRecordTable(query){
+  query = (query || '').trim().toLowerCase();
+
+  const rows = historyCache.filter(entry => {
+    if (!query) return true;
+    const ex = entry.result.extract || {};
+    const pi = entry.result.patientInputs || {};
+    const haystack = [
+      entry.patientName, ex.chart_no, ex.dob, pi.phone, entry.testDate, entry.savedAt
+    ].filter(Boolean).join(' ').toLowerCase();
+    return haystack.indexOf(query) !== -1;
+  });
+
+  const rowsHtml = rows.map(entry => {
+    const ex = entry.result.extract || {};
+    const pi = entry.result.patientInputs || {};
+    return `
+      <tr class="record-row" data-id="${entry.id}">
+        <td><strong>${escapeHtml(entry.patientName)}</strong></td>
+        <td class="rt-mono">${escapeHtml(ex.chart_no || '-')}</td>
+        <td class="rt-mono">${escapeHtml(ex.dob || '-')}</td>
+        <td class="rt-mono">${escapeHtml(pi.phone || '-')}</td>
+        <td>${escapeHtml(entry.testDate || '-')}</td>
+        <td><span class="rt-chip">${ex.overall_score != null ? escapeHtml(String(ex.overall_score)) : '-'}</span></td>
+        <td class="rt-mono">${escapeHtml(entry.savedAt.slice(0,10))}</td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('recordSearchCount').textContent = `${historyCache.length}건 중 ${rows.length}건 표시`;
+
+  const tableArea = document.getElementById('recordTableArea');
+  tableArea.innerHTML = rows.length ? `
+    <table class="record-table">
+      <thead>
+        <tr>
+          <th>이름</th><th>차트번호</th><th>생년월일</th><th>전화번호</th><th>검사일</th><th>점수</th><th>저장일</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+  ` : `<div class="search-empty">${historyCache.length ? '검색 결과가 없어요.' : '아직 분석 기록이 없어요.'}</div>`;
+
+  tableArea.querySelectorAll('.record-row').forEach(el => {
+    el.addEventListener('click', () => {
+      const entry = historyCache.find(x => x.id === el.dataset.id);
+      if (!entry) return;
+      currentResult = entry.result;
+      document.getElementById('btnSearch').classList.remove('active');
+      setActiveHistory(entry.id);
+      renderResults(currentResult);
+    });
   });
 }
 
