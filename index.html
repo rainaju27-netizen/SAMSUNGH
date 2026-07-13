@@ -637,6 +637,17 @@
     margin-top:14px;
     overflow:hidden;
   }
+  .copy-box-primary{
+    border:1.5px solid var(--primary);
+    margin-top:0;
+    margin-bottom:18px;
+    box-shadow:0 2px 12px -4px rgba(15,61,59,0.25);
+  }
+  .copy-box-primary .copy-box-header{
+    background:var(--primary-soft);
+    color:var(--primary);
+    font-size:13.5px;
+  }
   .copy-box-header{
     display:flex;
     align-items:center;
@@ -675,41 +686,6 @@
     max-height:320px;
     overflow-y:auto;
   }
-
-  /* kakao send */
-  .kakao-card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:16px 18px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:14px;
-    flex-wrap:wrap;
-  }
-  .kakao-card .kk-info{font-size:12.5px; color:var(--ink-soft);}
-  .kakao-card .kk-info strong{color:var(--ink);}
-  .btn-kakao{
-    padding:10px 18px;
-    border-radius:10px;
-    border:none;
-    background:#FEE500;
-    color:#1B1B1B;
-    font-family:var(--sans);
-    font-weight:800;
-    font-size:13.5px;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    white-space:nowrap;
-  }
-  .btn-kakao:hover{opacity:.9;}
-  .btn-kakao:disabled{opacity:.5; cursor:not-allowed;}
-  .kk-status{font-size:12px; margin-top:6px;}
-  .kk-status.ok{color:var(--green);}
-  .kk-status.err{color:var(--coral);}
 
   /* ---------- Patient info form ---------- */
   .form-card{
@@ -917,7 +893,7 @@ function renderUpload(){
           <input type="text" id="pChart" placeholder="예: M-1000756">
         </div>
         <div class="field">
-          <label>전화번호 <span class="req">(선택 · 카카오톡 발송용)</span></label>
+          <label>전화번호 <span class="req">(선택)</span></label>
           <input type="text" id="pPhone" placeholder="예: 010-1234-5678" inputmode="tel">
         </div>
       </div>
@@ -1419,15 +1395,16 @@ function renderResults(result){
       ${concernsHtml ? `
         <div>
           <div class="section-label">맞춤 운동 추천</div>
-          <div class="concern-grid">${concernsHtml}</div>
-          <div class="copy-box">
+
+          <div class="copy-box copy-box-primary">
             <div class="copy-box-header">
-              <span>전체 내용 한 번에 복사 (문자·카카오톡에 붙여넣기)</span>
+              <span>📱 카카오톡·문자로 바로 보내기 (전체 내용 한 번에 복사)</span>
               <button class="btn-copy" id="btnCopyExercise">📋 복사하기</button>
             </div>
             <pre class="copy-box-text" id="exerciseCopyText">${escapeHtml(buildExerciseMessage(result))}</pre>
           </div>
-          ${renderKakaoCard(result)}
+
+          <div class="concern-grid">${concernsHtml}</div>
         </div>
       ` : ''}
 
@@ -1446,11 +1423,6 @@ function renderResults(result){
     galleryGrid.querySelectorAll('.gallery-thumb').forEach(el => {
       el.addEventListener('click', () => openLightbox(result.images[parseInt(el.dataset.i,10)]));
     });
-  }
-
-  const kakaoBtn = document.getElementById('btnSendKakao');
-  if (kakaoBtn){
-    kakaoBtn.addEventListener('click', () => sendKakaoRecommendation(result));
   }
 
   const copyBtn = document.getElementById('btnCopyExercise');
@@ -1490,27 +1462,6 @@ function openLightbox(src){
 function statusClass(s){ return s === 'good' ? 'good' : s === 'bad' ? 'bad' : 'caution'; }
 function statusLabel(s){ return s === 'good' ? '좋음' : s === 'bad' ? '주의 필요' : '보통'; }
 
-/* ===================== 카카오톡 발송 ===================== */
-function renderKakaoCard(result){
-  const phone = result.patientInputs && result.patientInputs.phone;
-  if (!phone){
-    return `
-      <div class="kakao-card" style="margin-top:14px;">
-        <div class="kk-info">환자 정보에 <strong>전화번호</strong>를 입력하면, 이 운동 추천을 카카오톡으로 바로 보낼 수 있어요.</div>
-      </div>
-    `;
-  }
-  return `
-    <div class="kakao-card" style="margin-top:14px;">
-      <div class="kk-info"><strong>${escapeHtml(phone)}</strong> 님에게 운동 추천 목록을 카카오톡으로 보낼까요?</div>
-      <div>
-        <button class="btn-kakao" id="btnSendKakao">💬 카카오톡으로 보내기</button>
-        <div class="kk-status" id="kkStatus"></div>
-      </div>
-    </div>
-  `;
-}
-
 function buildExerciseMessage(result){
   const lines = [];
   lines.push((result.extract.patient_name || '환자') + '님, 검사 결과를 바탕으로 도움이 될 만한 운동을 보내드려요.');
@@ -1521,35 +1472,6 @@ function buildExerciseMessage(result){
     vids.forEach(v => lines.push('- ' + v.title + ' : ' + v.url));
   });
   return lines.join('\n');
-}
-
-async function sendKakaoRecommendation(result){
-  const btn = document.getElementById('btnSendKakao');
-  const statusEl = document.getElementById('kkStatus');
-  btn.disabled = true;
-  statusEl.textContent = '전송 중…';
-  statusEl.className = 'kk-status';
-
-  try{
-    const res = await fetch('/api/send-kakao', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: result.patientInputs.phone,
-        patientName: result.extract.patient_name || '환자',
-        message: buildExerciseMessage(result)
-      })
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || '전송에 실패했어요.');
-    statusEl.textContent = '전송 완료!';
-    statusEl.className = 'kk-status ok';
-  }catch(err){
-    statusEl.textContent = escapeHtml(err.message);
-    statusEl.className = 'kk-status err';
-  }finally{
-    btn.disabled = false;
-  }
 }
 
 /* ===================== 기록 저장/불러오기 (공유 서버 DB 사용) ===================== */
