@@ -1171,7 +1171,7 @@ async function callExtract(files, patientInputs, diagnosisImg){
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 3200,
+      max_tokens: 5000,
       messages: [{ role: 'user', content }]
     })
   });
@@ -1179,7 +1179,12 @@ async function callExtract(files, patientInputs, diagnosisImg){
   if (data.error) throw new Error(typeof data.error === 'string' ? data.error : (data.error.message || '분석 서버 오류'));
   const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
   const json = extractJSON(text);
-  if (!json) throw new Error('리포트 해석 결과를 읽을 수 없었어요. 이미지가 선명한지 확인해주세요.');
+  if (!json) {
+    if (data.stop_reason === 'max_tokens') {
+      throw new Error('응답이 너무 길어서 중간에 잘렸어요. 리포트 이미지 수를 줄이거나 다시 시도해주세요.');
+    }
+    throw new Error('리포트 해석 결과를 읽을 수 없었어요. 이미지가 선명한지 확인해주세요.');
+  }
   return json;
 }
 
