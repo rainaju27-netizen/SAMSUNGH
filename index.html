@@ -821,12 +821,25 @@
   /* ---------- Print ---------- */
   @media print{
     *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
+    @page{ margin:10mm; }
     body{background:#fff;}
     .app{max-width:100%; padding:0;}
     .layout{display:block;}
-    .sidebar, .toolbar-actions, .no-print{display:none !important;}
-    .metric-card, .concern-card{break-inside:avoid;}
-    .hero-card{break-inside:avoid;}
+    .sidebar, .toolbar-actions, .no-print, .app-header{display:none !important;}
+    .results{gap:10px;}
+    .hero-card{padding:16px 18px; break-inside:avoid; margin-bottom:0;}
+    .section-label{margin:10px 0 8px;}
+    .metric-track{gap:8px;}
+    .metric-card{padding:10px 12px 9px; break-inside:avoid;}
+    .metric-card .m-label{min-height:0; margin-bottom:5px;}
+    .concern-grid{gap:10px;}
+    .concern-card{padding:12px 14px; break-inside:avoid;}
+    .concern-card .c-issue{margin-bottom:6px;}
+    .c-clinical, .c-related{margin-bottom:6px; padding:7px 10px;}
+    .pain-chips{margin-bottom:8px;}
+    .concern-card .c-detail{margin-bottom:8px; padding-bottom:8px;}
+    .c-block{margin-bottom:8px;}
+    .disclaimer{font-size:10px; padding-top:4px;}
   }
 </style>
 </head>
