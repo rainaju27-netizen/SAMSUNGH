@@ -2,6 +2,7 @@
   "name": "gwanggyo-samsungh-gaitlab",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "광교삼성H정형외과 체형 분석 LAB - 체형/보행/족압 리포트 해설 도구",
   "dependencies": {
     "@vercel/postgres": "^0.10.0"
