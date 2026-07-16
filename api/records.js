@@ -63,6 +63,17 @@ export default async function handler(req, res) {
       return;
     }
 
+    if (req.method === 'DELETE') {
+      const id = req.query.id;
+      if (!id) {
+        res.status(400).json({ error: '삭제할 기록의 id가 필요합니다.' });
+        return;
+      }
+      await sql`DELETE FROM analysis_records WHERE id = ${id};`;
+      res.status(200).json({ ok: true });
+      return;
+    }
+
     res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     res.status(500).json({
